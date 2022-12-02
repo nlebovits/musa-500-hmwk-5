@@ -27,8 +27,9 @@ execute:
 
 library(NbClust)
 library(flexclust)
+library(dplyr)
+library(kableExtra)
 
-wine <- read.csv("wine.csv")
 
 ```
 
@@ -47,6 +48,72 @@ wine <- read.csv("wine.csv")
 
 **1.	Present and describe the results from the NbClust command and the scree plot.** 
 **a.	What’s the optimal number of clusters that you should choose based on the output?**
+
+The flee shows SSE(Sum of sqaure errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.
+
+```{r scree plot}
+
+regression <- read.csv("https://github.com/nlebovits/musa-500-hmwk-5/raw/main/data/RegressionData.csv") 
+data <- read.csv("https://github.com/nlebovits/musa-500-hmwk-5/raw/main/data/RegressionData.csv") 
+data <- data %>% select(-POLY_ID, -AREAKEY) 
+data <- scale(data)
+
+data_see <- (nrow(data)-1)*sum(apply(data,2,var))
+
+#nrow(data)-1
+#apply(data,2,var)
+
+kmeans(data, centers=2)
+for (i in 2:20) data_see[i] <- sum(kmeans(data, centers=i)$withinss)
+
+#data_see
+
+plot(1:20, data_see, type="b", xlab="Number of Clusters",
+     ylab="Within groups sum of squares")
+
+
+set.seed(100)
+nc <- NbClust(data, min.nc=2, max.nc=15, method="kmeans", index="all")
+
+table(nc$Best.n[1,])
+
+par(mfrow=c(1,1)) 
+barplot(table(nc$Best.n[1,]),
+        xlab="Numer of Clusters", ylab="Number of Criteria",
+        main="Number of Clusters Chosen by 26 Criteria")
+
+```
+
+**2.	Present and describe the table produced by the aggregate command showing the mean values of the MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT in each cluster.**
+**a.	Here, state whether the cluster solution makes sense and if so, come up with descriptive names for each of the resulting clusters.**
+
+```{r scree plot}
+
+set.seed(1234)
+fit.km <- kmeans(data, 3, nstart=1000)
+
+fit.km$size
+round(fit.km$centers, 2)
+fit.km$cluster
+
+cluster_info = as.data.frame(fit.km$cluster)
+
+regression <- cbind(regression, cluster_info)
+
+table <- cbind(round(aggregate(data, by=list(cluster=fit.km$cluster), mean),1),fit.km$size)
+ 
+colnames(table)[1] = c("CLUSTER")
+colnames(table)[8] = c("SIZE")
+
+table <- table[, c(1, 8, 2, 3, 4, 5, 6, 7)]
+  
+table %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+```
+
+**3.	Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
 
 
 ## Discussion
