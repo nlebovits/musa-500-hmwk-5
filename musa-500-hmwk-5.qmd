@@ -17,23 +17,36 @@ execute:
   messages: false
 ---
 
-## Quarto
+## Introduction
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+**1.	Describe the data set and indicate what the purpose of this assignment is. That is, how can k-means clustering help you look at the data, and what kinds of questions can you answer?**
 
-## Running Code
+```{r data and package import}
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+#install.packages(c("NbClust","flexclust"))
 
-```{r}
-1 + 1
+library(NbClust)
+library(flexclust)
+
+wine <- read.csv("wine.csv")
+
 ```
 
-You can add options to executable code like this
 
-```{r}
-#| echo: false
-2 * 2
-```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+## Methods
+
+**1.	How does the K-means algorithm work? Describe the steps in your own words.**
+
+**2.	What are some of the limitations of the algorithm?**
+
+**3.	What are some other clustering algorithms, and might they be more appropriate here?**
+
+
+## Results
+
+**1.	Present and describe the results from the NbClust command and the scree plot.** 
+**a.	What’s the optimal number of clusters that you should choose based on the output?**
+
+
+## Discussion
