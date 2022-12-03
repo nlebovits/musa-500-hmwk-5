@@ -19,7 +19,7 @@ execute:
 
 ## Introduction
 
-**1.	Describe the data set and indicate what the purpose of this assignment is. That is, how can k-means clustering help you look at the data, and what kinds of questions can you answer?**
+**1. Describe the data set and indicate what the purpose of this assignment is. That is, how can k-means clustering help you look at the data, and what kinds of questions can you answer?**
 
 ```{r data and package import}
 
@@ -29,29 +29,25 @@ library(NbClust)
 library(flexclust)
 library(dplyr)
 library(kableExtra)
-
+library(sf)
 
 ```
 
-
-
 ## Methods
 
-**1.	How does the K-means algorithm work? Describe the steps in your own words.**
+**1. How does the K-means algorithm work? Describe the steps in your own words.**
 
-**2.	What are some of the limitations of the algorithm?**
+**2. What are some of the limitations of the algorithm?**
 
-**3.	What are some other clustering algorithms, and might they be more appropriate here?**
-
+**3. What are some other clustering algorithms, and might they be more appropriate here?**
 
 ## Results
 
-**1.	Present and describe the results from the NbClust command and the scree plot.** 
-**a.	What’s the optimal number of clusters that you should choose based on the output?**
+**1. Present and describe the results from the NbClust command and the scree plot.** **a. What's the optimal number of clusters that you should choose based on the output?**
 
 The flee shows SSE(Sum of sqaure errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.
 
-```{r scree plot}
+```{r scree plot and criteria}
 
 regression <- read.csv("https://github.com/nlebovits/musa-500-hmwk-5/raw/main/data/RegressionData.csv") 
 data <- read.csv("https://github.com/nlebovits/musa-500-hmwk-5/raw/main/data/RegressionData.csv") 
@@ -84,10 +80,9 @@ barplot(table(nc$Best.n[1,]),
 
 ```
 
-**2.	Present and describe the table produced by the aggregate command showing the mean values of the MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT in each cluster.**
-**a.	Here, state whether the cluster solution makes sense and if so, come up with descriptive names for each of the resulting clusters.**
+**2. Present and describe the table produced by the aggregate command showing the mean values of the MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT in each cluster.** **a. Here, state whether the cluster solution makes sense and if so, come up with descriptive names for each of the resulting clusters.**
 
-```{r scree plot}
+```{r aggregated value}
 
 set.seed(1234)
 fit.km <- kmeans(data, 3, nstart=1000)
@@ -97,8 +92,6 @@ round(fit.km$centers, 2)
 fit.km$cluster
 
 cluster_info = as.data.frame(fit.km$cluster)
-
-regression <- cbind(regression, cluster_info)
 
 table <- cbind(round(aggregate(data, by=list(cluster=fit.km$cluster), mean),1),fit.km$size)
  
@@ -113,7 +106,27 @@ table %>%
 
 ```
 
-**3.	Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
+**3. Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
 
+**4.	In ArcGIS, join the .csv file that you exported from R to the RegressionData.shp by the field POLY_ID, and create a map showing the spatial distribution of the clusters.**
+**a.	State whether observations falling into the same K-means clusters also tend to cluster in space. That is, does the K-means cluster membership variable seem to be spatially autocorrelated?**
+**i.	You should not use Moran’s I here, because the cluster membership variable is categorical.**
+**b.	Does looking at the map yield any additional insight into the patterns you observe with the K-means analysis? Does it have any impact on how you might name the clusters?**
+
+```{r scree plot}
+
+Regression_cluster <- cbind(regression, cluster_info)
+
+regression_shp <- st_read("C:/Users/vestalk/Desktop/00_Upenn/20.Fall/03.MUSA 5000 Spatial Statistics and Data Analysis/Assignment/HW 5/RegressionData.shp") 
+
+regression_shp <- left_join(regression_shp, Regression_cluster, by = "POLY_ID") %>% st_as_sf()
+
+regression_cluster <- regression_shp %>% mutate(cluster = fit.km$cluster) %>% dplyr::select(cluster)
+
+plot(regression_cluster)
+
+```
 
 ## Discussion
+
+**1.	Briefly describe any patterns that you observe. Any surprising findings?**
