@@ -58,7 +58,7 @@ library(sf)
 2.  **(Technically) Numeric Data Only** -- K-means are technically only for numeric data with a sizable data set, though some use it for binary data as well.
 3.  **Encountering Problems With Clusters of Different Sizes, Densities, Clusters of Non-Globular Shapes --** K-means clustering assumes clusters to be of the same size (same number of data points getting assigned to each cluster / cluster center), same density (which impacts the distance to closest cluster centers), and the clusters to be of a globular shapes (not following a particular non-globular pattern). Hence, any deviance from any of those assumptions may lead to problems when implementing K-means.
 4.  **Inability to Handle Noises and Outliers** -- since each and every data point is going to be assigned to one of the clusters, the noises and outliers in the data set will be inevitably assigned to a cluster, making the clusters deviant from an ideal arrangement and messing up the clustering results.
-5.  local minimum instead of global minimum, sometimes resulting incorrect solution
+5.  **K-means might attempt to find local minimum instead of global minimum, sometimes resulting incorrect solution**
 
 ### 3. Other Available Clustering Algorithms
 
@@ -132,8 +132,6 @@ table %>%
   kable_paper("hover", full_width = F)
 
 ```
-
-**Present and describe the table produced by the aggregate command showing the mean values of the MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT in each cluster.** **a. Here, state whether the cluster solution makes sense and if so, come up with descriptive names for each of the resulting clusters.**
 
 Overall, the clustering makes sense across the 5 variables. We can see that cluster group 1 has the lowest house value, percentage of bachelor's degree, median household income, and percentage of single family houses, as well as highest percentage of vacant house and poverty rate out of all cluster group. Cluster group 2 is the opposite, and group 3 falls in between. The clustering shows socio-economic characteristics of each cluster groups, and taking everything into consideration, we came up with the following group names:
 
