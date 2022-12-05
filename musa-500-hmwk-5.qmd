@@ -23,7 +23,7 @@ execute:
 
 Clustering analysis helps us to identify if there is and (if so,) what kind of data clustering exist in a given data set. While it may not be the best method for exploring data, when we are dealing with large data set with more variables, clustering analysis help us partition it into smaller groups for further invesigation.
 
-In this assignment, we intend to use K-Means clustering method, which is widely used for larger data sets and numeric variables, to examine clustering of the data set we used for project 1 and 2. (Link?) K-means helps partition the data set into a number of non-overlapping clusters (k) set by researchers (us) prior. Given the data set we use having 5 variables, namely, **MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, PCTVACANT**, K-means clustering helps us identify if there is any clustering of the aggregated effect from the 5 variables.
+In this assignment, we intend to use K-Means clustering method, which is widely used for larger data sets and numeric variables, to examine clustering of the data set we used for project 1 and 2. (Link?) K-means helps partition the data set into a number of non-overlapping clusters (k) set by researchers (us) prior. Given the data set we use having 5 variables, namely, **MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, PCTVACANT**, K-means clustering helps us identify if there is any clustering of the aggregated effect from the 5 variables. Furthermore, we will look at whether clustering of those five variables are spatially auto-correlated.
 
 ```{r data and package import}
 
@@ -50,6 +50,8 @@ library(sf)
     3.  Given the assigned clusters with data points, recalculate new cluster centers for each cluster, which goes back to step 1 in the iterative process, or if there is no reassignment or after certain number of iteration, the process ends here.
 3.  The cluster centers and the clustering assignments of data points can be informative for clustering analysis.
 
+\*note that in this assignment, since we are looking at five different variables, we ensure that all data operates on the same scale before proceeding to K-means clustering and analysis.
+
 ### Limitations of K-Means
 
 1.  **Specify K-means in Advance** -- As mentioned above, for K-means, there is a necessity for researchers to identify the number of clusters (k) in advance. Although this is a limitation to k-means, there are methods to find the ideal k, one of them is referring to a SSE Scree Plot mentioned earlier.
@@ -66,7 +68,7 @@ DBSCAN: Density-Based Clustering
 
 ## Results
 
-**1. Present and describe the results from the NbClust command and the scree plot.** **a. What's the optimal number of clusters that you should choose based on the output?**
+### **1.  NbClust & SSE Scree Plot: Optimal Number of Clusters (k)**
 
 The first scree plot shows SSE (Sum of Sqaured errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.
 
@@ -103,7 +105,7 @@ barplot(table(nc$Best.n[1,]),
 
 ```
 
-**2. Present and describe the table produced by the aggregate command showing the mean values of the MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT in each cluster.** **a. Here, state whether the cluster solution makes sense and if so, come up with descriptive names for each of the resulting clusters.**
+### **2. Three Clusters, Five Variables**
 
 ```{r aggregated value}
 
@@ -129,15 +131,19 @@ table %>%
 
 ```
 
+**Present and describe the table produced by the aggregate command showing the mean values of the MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT in each cluster.** **a. Here, state whether the cluster solution makes sense and if so, come up with descriptive names for each of the resulting clusters.**
+
 Group 1: Lower Income
 
-Group 2: Bougie Area
+Group 2: Bougie Communities
 
-Group 3: mid-class
+Group 3: Middle Class
 
-**3. Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
+Overall, the clustering makes sense across the 5 variables.
 
-**4. In ArcGIS, join the .csv file that you exported from R to the RegressionData.shp by the field POLY_ID, and create a map showing the spatial distribution of the clusters.**
+### **3. Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
+
+### **4. In ArcGIS, join the .csv file that you exported from R to the RegressionData.shp by the field POLY_ID, and create a map showing the spatial distribution of the clusters.** 
 
 **a. State whether observations falling into the same K-means clusters also tend to cluster in space. That is, does the K-means cluster membership variable seem to be spatially autocorrelated?**
 
@@ -161,8 +167,8 @@ plot(regression_cluster)
 
 ```
 
-Partially spatially auto-correlated
+By plotting the three cluster groups on 5 variables on a map (as shown above), we can see some patterns of spatial auto-correlation. There seems to be spatial clustering of cluster group 2 (higher income, more educated communities) in some parts of the center city, the north western part of the city, and some parts in the north-eastern areas, and clustering of group 1 (lower income) in the area north to the center city and some parts of West Philly.
 
 ## Discussion
 
-**1. Briefly describe any patterns that you observe. Any surprising findings?**
+### **1. Briefly describe any patterns that you observe. Any surprising findings?**
