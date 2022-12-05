@@ -62,6 +62,8 @@ library(sf)
 
 ### 3. Other Available Clustering Algorithms
 
+Some other clustering methods include hierarchy clustering and DBSCAN (Density-Based Clustering).
+
 Hierarchy Clustering
 
 DBSCAN: Density-Based Clustering
@@ -141,9 +143,7 @@ Group 3: Middle Class
 
 Overall, the clustering makes sense across the 5 variables.
 
-### **3. Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
-
-### **4. Spatial Distribution of Clusters** 
+### **3. Spatial Distribution of Clusters** 
 
 ```{r scree plot}
 
@@ -161,11 +161,7 @@ plot(regression_cluster)
 
 ```
 
-By plotting the three cluster groups on 5 variables on a map (as shown above), we can see some patterns of spatial auto-correlation. There seems to be spatial clustering of cluster group 2 (higher income, more educated communities) in some parts of the center city, the north western part of the city, and some parts in the north-eastern areas, and clustering of group 1 (lower income) in the area north to the center city and some parts of West Philly.
-
-**i. You should not use Moran's I here, because the cluster membership variable is categorical.**
-
-**b. Does looking at the map yield any additional insight into the patterns you observe with the K-means analysis? Does it have any impact on how you might name the clusters?**
+By plotting the three cluster groups on 5 variables on a map (as shown above), we can see some patterns of spatial auto-correlation. There seems to be spatial clustering of cluster group 2 (higher income, more educated communities) in some parts of the center city, the north western part of the city, and some parts in the north-eastern areas, and clustering of group 1 (lower income) in the area north to the center city and some parts of West Philly. Since the clustering areas are not concentrated, it is difficult to rename the clusters by geographic locations.
 
 ## Discussion
 
