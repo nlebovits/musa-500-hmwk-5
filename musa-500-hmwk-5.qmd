@@ -21,6 +21,10 @@ execute:
 
 **1. Describe the data set and indicate what the purpose of this assignment is. That is, how can k-means clustering help you look at the data, and what kinds of questions can you answer?**
 
+Clustering analysis helps us to identify if there is and (if so,) what kind of data clustering exist in a given data set. While it may not be the best method for exploring data, when we are dealing with large data set with more variables, clustering analysis help us partition it into smaller groups for further invesigation.
+
+In this assignment, we intend to use K-Means clustering method, which is widely used for larger data sets and numeric variables, to examine clustering of the data set we used for project 1 and 2. (Link?) K-means helps partition the data set into a number of non-overlapping clusters (k) set by researchers (us) prior. Given the data set we use having 5 variables, namely, **MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, PCTVACANT**, K-means clustering helps us identify if there is any clustering of the aggregated effect from the 5 variables.
+
 ```{r data and package import}
 
 #install.packages(c("NbClust","flexclust"))
@@ -35,17 +39,36 @@ library(sf)
 
 ## Methods
 
-**1. How does the K-means algorithm work? Describe the steps in your own words.**
+### K-Means Algorithm
 
-**2. What are some of the limitations of the algorithm?**
+1.  The first step is for researchers to determine the intented number of clusters (k). While researchers can come up with a random k, there exists some method for choosing the best number of clusters. In R, the NbClust package helps. In this project, we will utilize this package for generating a Scree Plot of the Sum of Squared Errors (SSE) within each group, given a certain number of clusters.
+2.  Then comes a iterative process of improving the clustering assignment / identification, until there is no change in clustering membership (each data point is assigned to particular clustering center and no further change), or there after a set number of iterations. The process include:
+    1.  Identify K data points as centers for each cluster (usually random guesses)
 
-**3. What are some other clustering algorithms, and might they be more appropriate here?**
+    2.  Assign each data point to a cluster by calculating their Euclidean distance to cluster centers and choosing the closest cluster center.
+
+    3.  Given the assigned clusters with data points, recalculate new cluster centers for each cluster, which goes back to step 1 in the iterative process, or if there is no reassignment or after certain number of iteration, the process ends here.
+3.  The cluster centers and the clustering assignments of data points can be informative for clustering analysis.
+
+### Limitations of K-Means
+
+1.  **Specify K-means in Advance** -- As mentioned above, for K-means, there is a necessity for researchers to identify the number of clusters (k) in advance. Although this is a limitation to k-means, there are methods to find the ideal k, one of them is referring to a SSE Scree Plot mentioned earlier.
+2.  mostly eligible for numeric data (though some uses it for binary data as well)
+3.  resulting divergence when having clusters of different sizes, densities, or non-globular shapes
+4.  **Inability to Handle Noises and Outliers** -- since each and every data point is going to be assigned to one of the clusters, the noises and outliers in the data set will be inevitably assigned to a cluster, making the clusters deviant from an ideal arrangement and messing up the clustering results.
+5.  local minimum instead of global minimum, sometimes resulting incorrect solution
+
+### Other Available Clustering Algorithms
+
+Hierarchy Clustering
+
+DBSCAN: Density-Based Clustering
 
 ## Results
 
 **1. Present and describe the results from the NbClust command and the scree plot.** **a. What's the optimal number of clusters that you should choose based on the output?**
 
-The flee shows SSE(Sum of sqaure errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.
+The first scree plot shows SSE (Sum of Sqaured errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.
 
 ```{r scree plot and criteria}
 
@@ -106,18 +129,29 @@ table %>%
 
 ```
 
+Group 1: Lower Income
+
+Group 2: Bougie Area
+
+Group 3: mid-class
+
 **3. Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
 
-**4.	In ArcGIS, join the .csv file that you exported from R to the RegressionData.shp by the field POLY_ID, and create a map showing the spatial distribution of the clusters.**
-**a.	State whether observations falling into the same K-means clusters also tend to cluster in space. That is, does the K-means cluster membership variable seem to be spatially autocorrelated?**
-**i.	You should not use Moran’s I here, because the cluster membership variable is categorical.**
-**b.	Does looking at the map yield any additional insight into the patterns you observe with the K-means analysis? Does it have any impact on how you might name the clusters?**
+**4. In ArcGIS, join the .csv file that you exported from R to the RegressionData.shp by the field POLY_ID, and create a map showing the spatial distribution of the clusters.**
+
+**a. State whether observations falling into the same K-means clusters also tend to cluster in space. That is, does the K-means cluster membership variable seem to be spatially autocorrelated?**
+
+**i. You should not use Moran's I here, because the cluster membership variable is categorical.**
+
+**b. Does looking at the map yield any additional insight into the patterns you observe with the K-means analysis? Does it have any impact on how you might name the clusters?**
 
 ```{r scree plot}
 
 Regression_cluster <- cbind(regression, cluster_info)
 
 regression_shp <- st_read("C:/Users/vestalk/Desktop/00_Upenn/20.Fall/03.MUSA 5000 Spatial Statistics and Data Analysis/Assignment/HW 5/RegressionData.shp") 
+
+#regression_shp <- st_read("/Users/annzhang/Downloads/HW 5/RegressionData.shp") 
 
 regression_shp <- left_join(regression_shp, Regression_cluster, by = "POLY_ID") %>% st_as_sf()
 
@@ -127,6 +161,8 @@ plot(regression_cluster)
 
 ```
 
+Partially spatially auto-correlated
+
 ## Discussion
 
-**1.	Briefly describe any patterns that you observe. Any surprising findings?**
+**1. Briefly describe any patterns that you observe. Any surprising findings?**
