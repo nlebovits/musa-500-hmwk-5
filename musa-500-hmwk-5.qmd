@@ -135,13 +135,13 @@ table %>%
 
 **Present and describe the table produced by the aggregate command showing the mean values of the MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT in each cluster.** **a. Here, state whether the cluster solution makes sense and if so, come up with descriptive names for each of the resulting clusters.**
 
+Overall, the clustering makes sense across the 5 variables. We can see that cluster group 1 has the lowest house value, percentage of bachelor's degree, median household income, and percentage of single family houses, as well as highest percentage of vacant house and poverty rate out of all cluster group. Cluster group 2 is the opposite, and group 3 falls in between. The clustering shows socio-economic characteristics of each cluster groups, and taking everything into consideration, we came up with the following group names:
+
 Group 1: Lower Income
 
 Group 2: Bougie Communities
 
 Group 3: Middle Class
-
-Overall, the clustering makes sense across the 5 variables.
 
 ### **3. Spatial Distribution of Clusters** 
 
