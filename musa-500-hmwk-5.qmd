@@ -19,11 +19,11 @@ execute:
 
 ## Introduction
 
-**1. Describe the data set and indicate what the purpose of this assignment is. That is, how can k-means clustering help you look at the data, and what kinds of questions can you answer?**
-
 Clustering analysis helps us to identify if there is and (if so,) what kind of data clustering exist in a given data set. While it may not be the best method for exploring data, when we are dealing with large data set with more variables, clustering analysis help us partition it into smaller groups for further invesigation.
 
 In this assignment, we intend to use K-Means clustering method, which is widely used for larger data sets and numeric variables, to examine clustering of the data set we used for project 1 and 2. (Link?) K-means helps partition the data set into a number of non-overlapping clusters (k) set by researchers (us) prior. Given the data set we use having 5 variables, namely, **MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, PCTVACANT**, K-means clustering helps us identify if there is any clustering of the aggregated effect from the 5 variables. Furthermore, we will look at whether clustering of those five variables are spatially auto-correlated.
+
+By applying K-means clustering, we can answer questions like how do we categorize and characterize all those house owners? How many classes are we able to identify from the given data and what are their characteristics? Together with spatial data, we can answer questions like are specific classes spatially clustered? How do we change the clustering and bring equity to the city through policy?
 
 ```{r data and package import}
 
@@ -39,7 +39,7 @@ library(sf)
 
 ## Methods
 
-### K-Means Algorithm
+### 1. K-Means Algorithm
 
 1.  The first step is for researchers to determine the intented number of clusters (k). While researchers can come up with a random k, there exists some method for choosing the best number of clusters. In R, the NbClust package helps. In this project, we will utilize this package for generating a Scree Plot of the Sum of Squared Errors (SSE) within each group, given a certain number of clusters.
 2.  Then comes a iterative process of improving the clustering assignment / identification, until there is no change in clustering membership (each data point is assigned to particular clustering center and no further change), or there after a set number of iterations. The process include:
@@ -52,15 +52,15 @@ library(sf)
 
 \*note that in this assignment, since we are looking at five different variables, we ensure that all data operates on the same scale before proceeding to K-means clustering and analysis.
 
-### Limitations of K-Means
+### 2. Limitations of K-Means
 
 1.  **Specify K-means in Advance** -- As mentioned above, for K-means, there is a necessity for researchers to identify the number of clusters (k) in advance. Although this is a limitation to k-means, there are methods to find the ideal k, one of them is referring to a SSE Scree Plot mentioned earlier.
-2.  mostly eligible for numeric data (though some uses it for binary data as well)
-3.  resulting divergence when having clusters of different sizes, densities, or non-globular shapes
+2.  **(Technically) Numeric Data Only** -- K-means are technically only for numeric data with a sizable data set, though some use it for binary data as well.
+3.  **Encountering Problems With Clusters of Different Sizes, Densities, Clusters of Non-Globular Shapes --** K-means clustering assumes clusters to be of the same size (same number of data points getting assigned to each cluster / cluster center), same density (which impacts the distance to closest cluster centers), and the clusters to be of a globular shapes (not following a particular non-globular pattern). Hence, any deviance from any of those assumptions may lead to problems when implementing K-means.
 4.  **Inability to Handle Noises and Outliers** -- since each and every data point is going to be assigned to one of the clusters, the noises and outliers in the data set will be inevitably assigned to a cluster, making the clusters deviant from an ideal arrangement and messing up the clustering results.
 5.  local minimum instead of global minimum, sometimes resulting incorrect solution
 
-### Other Available Clustering Algorithms
+### 3. Other Available Clustering Algorithms
 
 Hierarchy Clustering
 
@@ -143,13 +143,7 @@ Overall, the clustering makes sense across the 5 variables.
 
 ### **3. Look up the syntax for the write.csv command and export the table containing the cluster ID of each observation into a .csv file (i.e., the .csv file should contain the variable that indicates which K-means cluster each observation falls into).**
 
-### **4. In ArcGIS, join the .csv file that you exported from R to the RegressionData.shp by the field POLY_ID, and create a map showing the spatial distribution of the clusters.** 
-
-**a. State whether observations falling into the same K-means clusters also tend to cluster in space. That is, does the K-means cluster membership variable seem to be spatially autocorrelated?**
-
-**i. You should not use Moran's I here, because the cluster membership variable is categorical.**
-
-**b. Does looking at the map yield any additional insight into the patterns you observe with the K-means analysis? Does it have any impact on how you might name the clusters?**
+### **4. Spatial Distribution of Clusters** 
 
 ```{r scree plot}
 
@@ -168,6 +162,10 @@ plot(regression_cluster)
 ```
 
 By plotting the three cluster groups on 5 variables on a map (as shown above), we can see some patterns of spatial auto-correlation. There seems to be spatial clustering of cluster group 2 (higher income, more educated communities) in some parts of the center city, the north western part of the city, and some parts in the north-eastern areas, and clustering of group 1 (lower income) in the area north to the center city and some parts of West Philly.
+
+**i. You should not use Moran's I here, because the cluster membership variable is categorical.**
+
+**b. Does looking at the map yield any additional insight into the patterns you observe with the K-means analysis? Does it have any impact on how you might name the clusters?**
 
 ## Discussion
 
