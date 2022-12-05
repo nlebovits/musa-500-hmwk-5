@@ -163,4 +163,4 @@ By plotting the three cluster groups on 5 variables on a map (as shown above), w
 
 ## Discussion
 
-### **1. Briefly describe any patterns that you observe. Any surprising findings?**
+To sum up, we used K-Means clustering on 5 variables and created three cluster groups representing three socio-economic groups and their respective house value. Although none of the findings are surprising, the map in result section examines the spatial clustering of the cluster groups we created shows a spatial autocorrelation.
