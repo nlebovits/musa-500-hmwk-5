@@ -62,17 +62,15 @@ library(sf)
 
 ### 3. Other Available Clustering Algorithms
 
-Some other clustering methods include hierarchy clustering and DBSCAN (Density-Based Clustering).
-
-Hierarchy Clustering
-
-DBSCAN: Density-Based Clustering
+Some other clustering methods include hierarchy clustering and DBSCAN (Density-Based Clustering). However, in comparison to the other two, K-means seems to be the most appropriate choice. Hierarchy Clustering is better suited for smaller data set, ideally under hundreds. Since this data set contains 1,720 data points, it may be too big for hierarchy clustering. Moreover, there is no particular reason why DBSCAN is necessarily more appropriate in this case.
 
 ## Results
 
 ### **1.  NbClust & SSE Scree Plot: Optimal Number of Clusters (k)**
 
 The first scree plot shows SSE (Sum of Sqaured errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.
+
+Given NbClust's ability to use different methods to seek for the ideal number of clusters, we have also plotted the number of clusters suggested using 26 criteria. From this plot, we can see that 2 and 3 clusters are most frequently suggested, yet in this situation, having only 2 clusters will not help with further analysis. Hence, our choice of 3 clusters seem appropriate.
 
 ```{r scree plot and criteria}
 
@@ -92,7 +90,7 @@ for (i in 2:20) data_see[i] <- sum(kmeans(data, centers=i)$withinss)
 #data_see
 
 plot(1:20, data_see, type="b", xlab="Number of Clusters",
-     ylab="Within groups sum of squares")
+     ylab="Within groups sum of squares erorrs")
 
 
 set.seed(100)
