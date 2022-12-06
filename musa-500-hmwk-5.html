@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.247">
+<meta name="generator" content="quarto-1.1.189">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Minwook Kang, Nissim Lebovits, and Ann Zhang">
-<meta name="dcterms.date" content="2022-12-01">
+<meta name="dcterms.date" content="2022-12-06">
 
 <title>K-Means Clustering</title>
 <style>
@@ -99,6 +99,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link href="musa-500-hmwk-5_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="musa-500-hmwk-5_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+<script src="musa-500-hmwk-5_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="musa-500-hmwk-5_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 
 </head>
 
@@ -110,8 +113,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#quarto" id="toc-quarto" class="nav-link active" data-scroll-target="#quarto">Quarto</a></li>
-  <li><a href="#running-code" id="toc-running-code" class="nav-link" data-scroll-target="#running-code">Running Code</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#k-means-algorithm" id="toc-k-means-algorithm" class="nav-link" data-scroll-target="#k-means-algorithm">1. K-Means Algorithm</a></li>
+  <li><a href="#limitations-of-k-means" id="toc-limitations-of-k-means" class="nav-link" data-scroll-target="#limitations-of-k-means">2. Limitations of K-Means</a></li>
+  <li><a href="#other-available-clustering-algorithms" id="toc-other-available-clustering-algorithms" class="nav-link" data-scroll-target="#other-available-clustering-algorithms">3. Other Available Clustering Algorithms</a></li>
+  </ul></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#nbclust-sse-scree-plot-optimal-number-of-clusters-k" id="toc-nbclust-sse-scree-plot-optimal-number-of-clusters-k" class="nav-link" data-scroll-target="#nbclust-sse-scree-plot-optimal-number-of-clusters-k"><strong>1. NbClust &amp; SSE Scree Plot: Optimal Number of Clusters (k)</strong></a></li>
+  <li><a href="#three-clusters-five-variables" id="toc-three-clusters-five-variables" class="nav-link" data-scroll-target="#three-clusters-five-variables"><strong>2. Three Clusters, Five Variables</strong></a></li>
+  <li><a href="#spatial-distribution-of-clusters" id="toc-spatial-distribution-of-clusters" class="nav-link" data-scroll-target="#spatial-distribution-of-clusters"><strong>3. Spatial Distribution of Clusters</strong></a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
   </ul>
 </nav>
 </div>
@@ -137,39 +152,235 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">December 1, 2022</p>
+      <p class="date">December 6, 2022</p>
     </div>
   </div>
-  
     
   </div>
   
 
 </header>
 
-<section id="quarto" class="level2">
-<h2 class="anchored" data-anchor-id="quarto">Quarto</h2>
-<p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org" class="uri">https://quarto.org</a>.</p>
-</section>
-<section id="running-code" class="level2">
-<h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
-<div class="cell" data-hash="musa-500-hmwk-5_cache/html/unnamed-chunk-1_32b65a8a5709c6c6452077a191f6360a">
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Clustering analysis helps us to identify if there is and (if so,) what kind of data clustering exist in a given data set. While it may not be the best method for exploring data, when we are dealing with large data set with more variables, clustering analysis help us partition it into smaller groups for further invesigation.</p>
+<p>In this assignment, we intend to use K-Means clustering method, which is widely used for larger data sets and numeric variables, to examine clustering of the data set we used for project 1 and 2. K-means helps partition the data set into a number of non-overlapping clusters (k) set by researchers (us) prior. Given the data set we use having 5 variables, namely, <strong>MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, PCTVACANT</strong>, K-means clustering helps us identify if there is any clustering of the aggregated effect from the 5 variables. Furthermore, we will look at whether clustering of those five variables are spatially auto-correlated.</p>
+<p>By applying K-means clustering, we can answer questions like how do we categorize and characterize all those house owners? How many classes are we able to identify from the given data and what are their characteristics? Together with spatial data, we can answer questions like are specific classes spatially clustered? How do we change the clustering and bring equity to the city through policy?</p>
+<div class="cell" data-hash="musa-500-hmwk-5_cache/html/data and package import_e60e22511e874b610e975897dc3c9180">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages(c("NbClust","flexclust"))</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(NbClust)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(flexclust)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+</div>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<section id="k-means-algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="k-means-algorithm">1. K-Means Algorithm</h3>
+<ul>
+<li>The first step is for researchers to determine the intented number of clusters (k). While researchers can come up with a random k, there exists some method for choosing the best number of clusters. In R, the NbClust package helps. In this project, we will utilize this package for generating a Scree Plot of the Sum of Squared Errors (SSE) within each group, given a certain number of clusters.</li>
+</ul>
+<ol start="2" type="1">
+<li>Then comes a iterative process of improving the clustering assignment / identification, until there is no change in clustering membership (each data point is assigned to particular clustering center and no further change), or there after a set number of iterations. The process include:
+<ol type="1">
+<li>Identify K data points as centers for each cluster (usually random guesses)</li>
+<li>Assign each data point to a cluster by calculating their Euclidean distance to cluster centers and choosing the closest cluster center.</li>
+<li>Given the assigned clusters with data points, recalculate new cluster centers for each cluster, which goes back to step 1 in the iterative process, or if there is no reassignment or after certain number of iteration, the process ends here.</li>
+</ol></li>
+<li>The cluster centers and the clustering assignments of data points can be informative for clustering analysis.</li>
+</ol>
+<p>*note that in this assignment, since we are looking at five different variables, we ensure that all data operates on the same scale before proceeding to K-means clustering and analysis.</p>
+</section>
+<section id="limitations-of-k-means" class="level3">
+<h3 class="anchored" data-anchor-id="limitations-of-k-means">2. Limitations of K-Means</h3>
+<ol type="1">
+<li><strong>Specify K-means in Advance</strong> – As mentioned above, for K-means, there is a necessity for researchers to identify the number of clusters (k) in advance. Although this is a limitation to k-means, there are methods to find the ideal k, one of them is referring to a SSE Scree Plot mentioned earlier.</li>
+<li><strong>(Technically) Numeric Data Only</strong> – K-means are technically only for numeric data with a sizable data set, though some use it for binary data as well.</li>
+<li><strong>Encountering Problems With Clusters of Different Sizes, Densities, Clusters of Non-Globular Shapes –</strong> K-means clustering assumes clusters to be of the same size (same number of data points getting assigned to each cluster / cluster center), same density (which impacts the distance to closest cluster centers), and the clusters to be of a globular shapes (not following a particular non-globular pattern). Hence, any deviance from any of those assumptions may lead to problems when implementing K-means.</li>
+<li><strong>Inability to Handle Noises and Outliers</strong> – since each and every data point is going to be assigned to one of the clusters, the noises and outliers in the data set will be inevitably assigned to a cluster, making the clusters deviant from an ideal arrangement and messing up the clustering results.</li>
+<li><strong>K-means might attempt to find local minimum instead of global minimum, sometimes resulting incorrect solution</strong></li>
+</ol>
+</section>
+<section id="other-available-clustering-algorithms" class="level3">
+<h3 class="anchored" data-anchor-id="other-available-clustering-algorithms">3. Other Available Clustering Algorithms</h3>
+<p>Some other clustering methods include hierarchy clustering and DBSCAN (Density-Based Clustering). However, in comparison to the other two, K-means seems to be the most appropriate choice. Hierarchy Clustering is better suited for smaller data set, ideally under hundreds. Since this data set contains 1,720 data points, it may be too big for hierarchy clustering. Moreover, there is no particular reason why DBSCAN is necessarily more appropriate in this case.</p>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="nbclust-sse-scree-plot-optimal-number-of-clusters-k" class="level3">
+<h3 class="anchored" data-anchor-id="nbclust-sse-scree-plot-optimal-number-of-clusters-k"><strong>1. NbClust &amp; SSE Scree Plot: Optimal Number of Clusters (k)</strong></h3>
+<p>The first scree plot shows SSE (Sum of Sqaured errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.</p>
+<p>Given NbClust’s ability to use different methods to seek for the ideal number of clusters, we have also plotted the number of clusters suggested using 26 criteria. From this plot, we can see that 2 and 3 clusters are most frequently suggested, yet in this situation, having only 2 clusters will not help with further analysis. Hence, our choice of 3 clusters seem appropriate.</p>
+<div class="cell" data-hash="musa-500-hmwk-5_cache/html/scree plot and criteria_ba858b6596a64c8c1f90958e1cfcec52">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>regression <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://github.com/nlebovits/musa-500-hmwk-5/raw/main/data/RegressionData.csv"</span>) </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"https://github.com/nlebovits/musa-500-hmwk-5/raw/main/data/RegressionData.csv"</span>) </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>POLY_ID, <span class="sc">-</span>AREAKEY) </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">scale</span>(data)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>data_see <span class="ot">&lt;-</span> (<span class="fu">nrow</span>(data)<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span><span class="fu">sum</span>(<span class="fu">apply</span>(data,<span class="dv">2</span>,var))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#nrow(data)-1</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#apply(data,2,var)</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kmeans</span>(data, <span class="at">centers=</span><span class="dv">2</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">20</span>) data_see[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">kmeans</span>(data, <span class="at">centers=</span>i)<span class="sc">$</span>withinss)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#data_see</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, data_see, <span class="at">type=</span><span class="st">"b"</span>, <span class="at">xlab=</span><span class="st">"Number of Clusters"</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab=</span><span class="st">"Within groups sum of squares erorrs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="musa-500-hmwk-5_files/figure-html/scree%20plot%20and%20criteria-1.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>nc <span class="ot">&lt;-</span> <span class="fu">NbClust</span>(data, <span class="at">min.nc=</span><span class="dv">2</span>, <span class="at">max.nc=</span><span class="dv">15</span>, <span class="at">method=</span><span class="st">"kmeans"</span>, <span class="at">index=</span><span class="st">"all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="musa-500-hmwk-5_files/figure-html/scree%20plot%20and%20criteria-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="musa-500-hmwk-5_files/figure-html/scree%20plot%20and%20criteria-3.png" class="img-fluid" width="672"></p>
+</div>
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#table(nc$Best.n[1,])</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>)) </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(<span class="fu">table</span>(nc<span class="sc">$</span>Best.n[<span class="dv">1</span>,]),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab=</span><span class="st">"Numer of Clusters"</span>, <span class="at">ylab=</span><span class="st">"Number of Criteria"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">main=</span><span class="st">"Number of Clusters Chosen by 26 Criteria"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="musa-500-hmwk-5_files/figure-html/scree%20plot%20and%20criteria-4.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>You can add options to executable code like this</p>
-<div class="cell" data-hash="musa-500-hmwk-5_cache/html/unnamed-chunk-2_a1166eedb8d505efeba591f4cb3a7a0f">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
+</section>
+<section id="three-clusters-five-variables" class="level3">
+<h3 class="anchored" data-anchor-id="three-clusters-five-variables"><strong>2. Three Clusters, Five Variables</strong></h3>
+<div class="cell" data-hash="musa-500-hmwk-5_cache/html/aggregated value_44a181fb22e365fc9be20d22959ff24b">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>fit.km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(data, <span class="dv">3</span>, <span class="at">nstart=</span><span class="dv">1000</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fit.km<span class="sc">$</span>size</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(fit.km<span class="sc">$</span>centers, <span class="dv">2</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>fit.km<span class="sc">$</span>cluster</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>cluster_info <span class="ot">=</span> <span class="fu">as.data.frame</span>(fit.km<span class="sc">$</span>cluster)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>table <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">round</span>(<span class="fu">aggregate</span>(data, <span class="at">by=</span><span class="fu">list</span>(<span class="at">cluster=</span>fit.km<span class="sc">$</span>cluster), mean),<span class="dv">1</span>),fit.km<span class="sc">$</span>size)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(table)[<span class="dv">1</span>] <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"CLUSTER"</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(table)[<span class="dv">8</span>] <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"SIZE"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-hash="musa-500-hmwk-5_cache/html/aggregated value2_a7236bc639051873a62e8af232a5ea5f">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>table <span class="ot">&lt;-</span> table[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">8</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>)]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>table <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kbl</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_paper</span>(<span class="st">"hover"</span>, <span class="at">full_width =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table class=" lightable-paper lightable-hover" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:right;"> CLUSTER </th>
+   <th style="text-align:right;"> SIZE </th>
+   <th style="text-align:right;"> MEDHVAL </th>
+   <th style="text-align:right;"> PCTBACHMOR </th>
+   <th style="text-align:right;"> MEDHHINC </th>
+   <th style="text-align:right;"> PCTVACANT </th>
+   <th style="text-align:right;"> PCTSINGLES </th>
+   <th style="text-align:right;"> NBELPOV100 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 651 </td>
+   <td style="text-align:right;"> -0.5 </td>
+   <td style="text-align:right;"> -0.5 </td>
+   <td style="text-align:right;"> -0.7 </td>
+   <td style="text-align:right;"> 0.8 </td>
+   <td style="text-align:right;"> -0.2 </td>
+   <td style="text-align:right;"> 0.7 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:right;"> 159 </td>
+   <td style="text-align:right;"> 2.0 </td>
+   <td style="text-align:right;"> 2.2 </td>
+   <td style="text-align:right;"> 1.6 </td>
+   <td style="text-align:right;"> -0.7 </td>
+   <td style="text-align:right;"> 1.5 </td>
+   <td style="text-align:right;"> -0.6 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 910 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.2 </td>
+   <td style="text-align:right;"> -0.5 </td>
+   <td style="text-align:right;"> -0.1 </td>
+   <td style="text-align:right;"> -0.4 </td>
+  </tr>
+</tbody>
+</table>
+
 </div>
 </div>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+<p>Overall, the clustering makes sense across the 5 variables. We can see that cluster group 1 has the lowest house value, percentage of bachelor’s degree, median household income, and percentage of single family houses, as well as highest percentage of vacant house and poverty rate out of all cluster group. Cluster group 2 is the opposite, and group 3 falls in between. The clustering shows socio-economic characteristics of each cluster groups, and taking everything into consideration, we came up with the following group names:</p>
+<ul>
+<li>Group 1: Lower Income</li>
+<li>Group 2: Bougie Communiti</li>
+<li>Group 3: Middle Class</li>
+</ul>
+</section>
+<section id="spatial-distribution-of-clusters" class="level3">
+<h3 class="anchored" data-anchor-id="spatial-distribution-of-clusters"><strong>3. Spatial Distribution of Clusters</strong></h3>
+<div class="cell" data-hash="musa-500-hmwk-5_cache/html/Spatial Distribution of Clusters_4949887b59ebdf4a6eb071602d2ef2bc">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Regression_cluster <span class="ot">&lt;-</span> <span class="fu">cbind</span>(regression, cluster_info)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>regression_shp <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"C:/Users/vestalk/Desktop/00_Upenn/20.Fall/03.MUSA 5000 Spatial Statistics and Data Analysis/Assignment/HW 5/RegressionData.shp"</span>) </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#regression_shp &lt;- st_read("/Users/annzhang/Downloads/HW 5/RegressionData.shp") </span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>regression_shp <span class="ot">&lt;-</span> <span class="fu">left_join</span>(regression_shp, Regression_cluster, <span class="at">by =</span> <span class="st">"POLY_ID"</span>) <span class="sc">%&gt;%</span> <span class="fu">st_as_sf</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>regression_cluster <span class="ot">&lt;-</span> regression_shp <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">cluster =</span> fit.km<span class="sc">$</span>cluster) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(cluster)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(regression_cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="musa-500-hmwk-5_files/figure-html/Spatial%20Distribution%20of%20Clusters-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>By plotting the three cluster groups on 5 variables on a map (as shown above), we can see some patterns of spatial auto-correlation. There seems to be spatial clustering of cluster group 2 (higher income, more educated communities) in some parts of the center city, the north western part of the city, and some parts in the north-eastern areas, and clustering of group 1 (lower income) in the area north to the center city and some parts of West Philly. Since the clustering areas are not concentrated, it is difficult to rename the clusters by geographic locations.</p>
+</section>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+<p>To sum up, we used K-Means clustering on 5 variables and created three cluster groups representing three socio-economic groups and their respective house value. The clustering does a relatively good job in identifying clusters. Although none of the findings are surprising, the map in result section examines the spatial clustering of the cluster groups we created shows a spatial autocorrelation.</p>
 </section>
 
 </main>
@@ -215,24 +426,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
     setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -268,42 +462,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
       });
-    }
+      return popup.innerHTML;
+    });
   }
 });
 </script>
