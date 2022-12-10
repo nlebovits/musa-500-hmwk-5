@@ -19,11 +19,11 @@ execute:
 
 ## Introduction
 
-Clustering analysis helps us to identify if there is and (if so,) what kind of data clustering exist in a given data set. While it may not be the best method for exploring data, when we are dealing with large data set with more variables, clustering analysis help us partition it into smaller groups for further investigation.
+Clustering analysis helps us to identify clustering in a dataset. In exploring data, it is particularly helpful for partitioning data into smaller groups for further investigation.
 
-In this assignment, we intend to use K-Means clustering method, which is widely used for larger data sets and numeric variables, to examine clustering of the data set we used for project 1 and 2. K-means helps partition the data set into a number of non-overlapping clusters (k) set by researchers (us) prior. Given the data set we use having 5 variables, namely, **MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, PCTVACANT**, K-means clustering helps us identify if there is any clustering of the aggregated effect from the 5 variables. Furthermore, we will look at whether clustering of those five variables are spatially auto-correlated.
+In this assignment, we use k-means clustering, which is widely applied to larger datasets and numeric variables. Here, we examine the same dataset that we used in Homeworks #1 and #2. K-means partitions the dataset into a number $k$ of overlapping clusters, $k$ being predetermined by the researchers. Our dataset includes five variables: MEDHVAL, MEDHHINC, PCTBACHMOR, PCTSINGLES, and PCTVACANT. K-means clustering will help us to identify if there is any clustering in the aggregated effect of these variables. Furthermore, we will examine whether the clustering of these variables is spatially autocorrelated.
 
-By applying K-means clustering, we can answer questions like how do we categorize and characterize all those house owners? How many classes are we able to identify from the given data and what are their characteristics? Together with spatial data, we can answer questions like are specific classes spatially clustered? How do we change the clustering and bring equity to the city through policy?
+By applying k-means clustering, we can answer questions like, How do we categorize the homeowners in question? How many classes are we able to identify from the data, and what are their characteristics? Incorporating spatial data, we can answer questions like, Are specific classes spatially clustered? Can we leverage our understanding of these clusters to create more equitable city policy?
 
 ```{r data and package import}
 
@@ -41,34 +41,35 @@ library(sf)
 
 ### 1. K-Means Algorithm
 
--  The first step is for researchers to determine the intented number of clusters (k). While researchers can come up with a random k, there exists some method for choosing the best number of clusters. In R, the NbClust package helps. In this project, we will utilize this package for generating a Scree Plot of the Sum of Squared Errors (SSE) within each group, given a certain number of clusters.
-2.  Then comes a iterative process of improving the clustering assignment / identification, until there is no change in clustering membership (each data point is assigned to particular clustering center and no further change), or there after a set number of iterations. The process include:
-    1.  Identify K data points as centers for each cluster (usually random guesses)
-    2.  Assign each data point to a cluster by calculating their Euclidean distance to cluster centers and choosing the closest cluster center.
-    3.  Given the assigned clusters with data points, recalculate new cluster centers for each cluster, which goes back to step 1 in the iterative process, or if there is no reassignment or after certain number of iteration, the process ends here.
-3.  The cluster centers and the clustering assignments of data points can be informative for clustering analysis.
+First, reseachers deterine the intended number ($k$) of clusters. There are various methods for selecting a best value for $k$. In R, the `NbClust` package helps. In this project, we will utilize this package to generate a scree plot of the sum of squared errors (SSE) within each group, which will yield the ideal value for $k$. 
 
-\*note that in this assignment, since we are looking at five different variables, we ensure that all data operates on the same scale before proceeding to K-means clustering and analysis.
+Next, we iteratively improve cluster assignment until there is no change in clustering membership (i.e., each data point is assigned to a particular clustering center without further change), or until a set number of iterations. This process involves:\
+1. Identify $k$ data points as centers for each cluster (usually randomly)
+2. Assign each data point to a cluster by calculating its Euclidian distance from the cluster centers and choosing the closest center
+3. Given the assigned clusters with data points, recalculate new centers for each cluster, then repeat from step #1. If there is no change, or if you have reached the pre-set number of iterations, stop here.
+
+In this assignment, since we are looking at five different variables, we ensure that all data operate at the sme scale before proceeding to k-means clustering and analysis.
 
 ### 2. Limitations of K-Means
 
-1.  **Specify K-means in Advance** -- As mentioned above, for K-means, there is a necessity for researchers to identify the number of clusters (k) in advance. Although this is a limitation to k-means, there are methods to find the ideal k, one of them is referring to a SSE Scree Plot mentioned earlier.
-2.  **(Technically) Numeric Data Only** -- K-means are technically only for numeric data with a sizable data set, though some use it for binary data as well.
-3.  **Encountering Problems With Clusters of Different Sizes, Densities, Clusters of Non-Globular Shapes --** K-means clustering assumes clusters to be of the same size (same number of data points getting assigned to each cluster / cluster center), same density (which impacts the distance to closest cluster centers), and the clusters to be of a globular shapes (not following a particular non-globular pattern). Hence, any deviance from any of those assumptions may lead to problems when implementing K-means.
-4.  **Inability to Handle Noises and Outliers** -- since each and every data point is going to be assigned to one of the clusters, the noises and outliers in the data set will be inevitably assigned to a cluster, making the clusters deviant from an ideal arrangement and messing up the clustering results.
-5.  **K-means might attempt to find local minimum instead of global minimum, sometimes resulting incorrect solution**
+1. As mentioned above, k-means clustering requires researchers to specify the number of clusters in advance. However, there are methods to find the ideal $k$, such as the SSE scree plot we mentioned earlier.
+2. K-means clustering is technically only for sizable sets of numeric data, although some use the method for binary data as well.
+3. K-means clustering assumes clusters to be of the same size (i.e., the same number of data points are assigned to each cluster/cluster center) and same density (which impacts the distance to nearest cluster centers). Additionally, it assumes that clusters are globular. Any deviance from these assumptions may lead to problems when implementing k-means clustering.
+4. Because each data point must be assigned to a cluster, the k-means approach struggles to accommodate noise or outliers.
+5. K-means might attempt to find local minimums instead of a global minimum, leading to incorrect results.
+
 
 ### 3. Other Available Clustering Algorithms
 
-Some other clustering methods include hierarchy clustering and DBSCAN (Density-Based Clustering). However, in comparison to the other two, K-means seems to be the most appropriate choice. Hierarchy Clustering is better suited for smaller data set, ideally under hundreds. Since this data set contains 1,720 data points, it may be too big for hierarchy clustering. Moreover, there is no particular reason why DBSCAN is necessarily more appropriate in this case.
+Other clustering methods include hierarchical clustering and density-based clustering (DBSCAN). In comparison to the other two, though, k-means appears to be the most appropriate choice in our context. Hierarchical clustering is better suited to smaller datasets, ideally under 100. Since this dataset contains 1,720 observations, it is too big for hierarchical clustering. There is no reason why DBSCAN is more or less appropriate in this case.
 
 ## Results
 
 ### **1.  NbClust & SSE Scree Plot: Optimal Number of Clusters (k)**
 
-The first scree plot shows SSE (Sum of Sqaured errors) of each number of clusters from 1 to 20. In the graph below, there is a distinct drop of SSE, when cluster moves from 1 to 3. After four clusters, rate of decreasing drops off, suggesting that 3-cluster solution is likely to be a good option to our data.
+The first scree plot shows the SSE of each number of clusters from 1 to 20. In the graph below, there is a distinct drop in the SSE when the number of clusters moves from 1 to 3. After four clusters, the rate of decrease drops off, suggesting that a 3-cluster solution is likely to be a good option for our data.
 
-Given NbClust's ability to use different methods to seek for the ideal number of clusters, we have also plotted the number of clusters suggested using 26 criteria. From this plot, we can see that 2 and 3 clusters are most frequently suggested, yet in this situation, having only 2 clusters will not help with further analysis. Hence, our choice of 3 clusters seem appropriate.
+Given NbClust's ability to use different methods to seek the ideal number of clusters, we have also plotted the number of clusters suggested using 26 criteria. From this plot, we can see that 2 and 3 clusters are most frequently suggested, yet in this situation, having only 2 clusters will not help with further analysis. Hence, our choice of 3 clusters seem appropriate.
 
 ```{r scree plot and criteria,  results='hide', fig.keep='all'}
 
@@ -133,10 +134,10 @@ table %>%
 ```
 
 
-Overall, the clustering makes sense across the 5 variables. We can see that cluster group 1 has the lowest house value, percentage of bachelor's degree, median household income, and percentage of single family houses, as well as highest percentage of vacant house and poverty rate out of all cluster group. Cluster group 2 is the opposite, and group 3 falls in between. The clustering shows socio-economic characteristics of each cluster groups, and taking everything into consideration, we came up with the following group names:
+Overall, the clusters makes sense across the 5 variables. We can see that Group 1 has the lowest house value, percentage of bachelor's degree, median household income, and percentage of single family houses, as well as the highest percentage of vacant house and poverty rate out of all cluster group. Group 2 is the opposite, and Group 3 falls in between. The clustering shows the socioeconomic characteristics of each group; taking everything into consideration, we came up with the following group names:
 
 - Group 1: Lower Income
-- Group 2: Bougie Communiti
+- Group 2: Bougie Community
 - Group 3: Middle Class
 
 ### **3. Spatial Distribution of Clusters** 
@@ -145,7 +146,7 @@ Overall, the clustering makes sense across the 5 variables. We can see that clus
 
 Regression_cluster <- cbind(regression, cluster_info)
 
-regression_shp <- st_read("https://github.com/nlebovits/musa-500-hmwk-5/tree/main/data/RegressionData.shp") 
+regression_shp <- st_read('C:/Users/Nissim/Desktop/Fall 2022/Spat Stats/Homeworks/ass_1_data_shp/RegressionData.shp') 
 
 #regression_shp <- st_read("/Users/annzhang/Downloads/HW 5/RegressionData.shp") 
 
@@ -157,8 +158,8 @@ plot(regression_cluster)
 
 ```
 
-By plotting the three cluster groups on 5 variables on a map (as shown above), we can see some patterns of spatial auto-correlation. There seems to be spatial clustering of cluster group 2 (higher income, more educated communities) in some parts of the center city, the north western part of the city, and some parts in the north-eastern areas, and clustering of group 1 (lower income) in the area north to the center city and some parts of West Philly. Since the clustering areas are not concentrated, it is difficult to rename the clusters by geographic locations.
+By plotting the three groups on a map (as shown above), we can see some spatial autocorrelation. There seems to be spatial clustering of Group 2 (higher income, more educated communities) in some parts of Center City, the northwestern part of the city, and some parts of the northeast, and clustering of Group 1 (lower income) in the area north to the center city and some parts of West Philly. Since the clustering areas are not concentrated, it is difficult to rename the clusters by geographic locations.
 
 ## Discussion
 
-To sum up, we used K-Means clustering on 5 variables and created three cluster groups representing three socio-economic groups and their respective house value. The clustering does a relatively good job in identifying clusters. Although none of the findings are surprising, the map in result section examines the spatial clustering of the cluster groups we created shows a spatial autocorrelation.
+To sum up, we used k-means clustering on 5 variables and created three cluster groups representing three socioeconomic groups and their respective house value. The clustering does a relatively good job of identifying clusters. Although none of the findings are surprising, the map in result section examines the spatial clustering of the cluster groups we created shows a spatial autocorrelation.
